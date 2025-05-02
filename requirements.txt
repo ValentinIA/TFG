@@ -1,0 +1,7 @@
+fastapi[all]
+requests
+beautifulsoup4
+lxml
+uvicorn
+undetected-chromedriver
+selenium
