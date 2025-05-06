@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_producto(url):
+def get_producto_amazon(url):
 
     user_agents = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
@@ -39,7 +39,7 @@ def get_producto(url):
     return titulo, precio, imagen_url
 
 
-def get_lista_productos_amazone(producto):
+def get_lista_productos_amazon(producto):
     user_agents = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
@@ -70,12 +70,12 @@ def get_lista_productos_amazone(producto):
 
     lista_productos = []
     for url_producto in lista_urls:
-        titulo, precio, imagen_url = get_producto(url_producto)
+        titulo, precio, imagen_url = get_producto_amazon(url_producto)
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
             "imagen_url": imagen_url,
-            "url": url_producto,
+            "url": url_producto
         }
         lista_productos.append(obj_producto)
 

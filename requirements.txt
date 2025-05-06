@@ -5,3 +5,4 @@ lxml
 uvicorn
 undetected-chromedriver
 selenium
+mysql-connector-python

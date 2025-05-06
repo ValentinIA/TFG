@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import undetected_chromedriver as uc
 
 
-def get_producto(url):
+def get_producto_pccomponentes(url):
     # Configurar navegador
     options = Options()
     # options.add_argument('--headless')  # Para modo sin ventana
@@ -100,7 +100,7 @@ def get_lista_productos_pccomponentes(producto):
 
     lista_productos = []
     for url_producto in lista_urls:
-        titulo, precio, imagen_url = get_producto(url_producto)
+        titulo, precio, imagen_url = get_producto_pccomponentes(url_producto)
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
