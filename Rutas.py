@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from ScrapAmazone import get_lista_productos_amazon, get_producto_amazon
+from ScrapAmazone import get_lista_productos_amazon as obtener_productos_amazon
 from ScrapMediaMarkt import get_lista_productos_mediamarkt, get_producto_mediamarkt
-from ScrapPcComponentes import (
-    get_lista_productos_pccomponentes,
-    get_producto_pccomponentes,
-)
+from ScrapPcComponentes import get_lista_productos_pccomponentes, get_producto_pccomponentes
+
 
 app = FastAPI()
 
@@ -20,8 +18,8 @@ app.add_middleware(
 
 
 @app.get("/get_productos_amazon/{producto}")
-def get_lista_productos_amazon(producto: str):
-    return get_lista_productos_amazon(producto)
+async def get_lista_productos_amazon(producto: str):    
+    return await obtener_productos_amazon(producto)
 
 
 @app.get("/get_productos_mediamarkt/{producto}")
@@ -34,11 +32,11 @@ def get_productos_pccomponentes(producto: str):
     return get_lista_productos_pccomponentes(producto)
 
 
-@app.get("/get_producto_amazon/{url:path}")
+'''@app.get("/get_producto_amazon/{url:path}")
 def get_lista_productos_amazon(url: str):
     print(url)
     titulo, precio, imagen_url = get_producto_amazon(url)
-    return {"titulo": titulo, "precio": precio, "imagen_url": imagen_url, "url": url}
+    return {"titulo": titulo, "precio": precio, "imagen_url": imagen_url, "url": url}'''
 
 
 @app.get("/get_producto_mediamarkt/{url:path}")

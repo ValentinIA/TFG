@@ -75,6 +75,7 @@ def get_lista_productos_mediamarkt(producto):
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
+            "tienda": "MediaMarkt",
             "imagen_url": imagen_url,
             "url": url_producto
         }

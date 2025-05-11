@@ -1,82 +1,103 @@
-import random
-import requests
-from bs4 import BeautifulSoup
+from crawl4ai import AsyncWebCrawler
+from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
+from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
+import json
+from urllib.parse import urljoin
 
+async def get_lista_productos_amazon(producto):
+    """
+    Función asíncrona para obtener productos de Amazon.
+    
+    Args:
+        producto (str): Término de búsqueda para productos en Amazon
+        
+    Returns:
+        list: Lista de diccionarios con información de productos
+    """
+    # Configuración del browser que usará
+    browser_config = BrowserConfig(browser_type="chromium", headless=True)
 
-def get_producto_amazon(url):
+    # Reglas para localizar contenido
+    crawler_config = CrawlerRunConfig(
+        extraction_strategy=JsonCssExtractionStrategy(
+            schema={
+                "name": "Amazon Product Search Results",
+                "baseSelector": "[data-component-type='s-search-result']",
+                "fields": [
+                    {
+                        "name": "title",
+                        "selector": "h2 span",
+                        "type": "text"
+                    },
+                    {
+                        "name": "url",
+                        "selector": "a.a-link-normal.s-no-outline",
+                        "type": "attribute",
+                        "attribute": "href",
+                    },
+                    {
+                        "name": "image",
+                        "selector": ".s-image",
+                        "type": "attribute",
+                        "attribute": "src",
+                    },
+                    {
+                        "name": "price",
+                        "selector": ".a-price .a-offscreen",
+                        "type": "text",
+                    }
+                ],
+            }
+        )
+    )
 
-    user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15",
-    ]
-
-    headers = {
-        "User-Agent": random.choice(user_agents),
-        "Accept-Language": "es-ES,es;q=0.9",
-    }
-
-    respuesta = requests.get(url, headers=headers)
-    soup = BeautifulSoup(respuesta.text, "lxml")
-
-    try:
-        titulo = soup.find("span", id="productTitle").get_text(strip=True)
-    except AttributeError:
-        titulo = "Título no encontrado"
-    try:
-        precio = soup.find("span", {"class": "a-offscreen"}).get_text(strip=True)
-    except AttributeError:
-        precio = "Precio no encontrado"
-    try:
-        imagen_url = soup.find(id="landingImage")["src"]
-    except (AttributeError, TypeError):
-        imagen_url = None
-
-    return titulo, precio, imagen_url
-
-
-def get_lista_productos_amazon(producto):
-    user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15",
-    ]
-
-    headers = {
-        "User-Agent": random.choice(user_agents),
-        "Accept-Language": "es-ES,es;q=0.9",
-    }
-
+    # Url que scrappeará
     url = f"https://www.amazon.es/s?k={producto}"
-    respuesta = requests.get(url, headers=headers)
-    soup = BeautifulSoup(respuesta.text, "lxml")
 
-    lista_urls = [
-        "https://www.amazon.es" + link["href"]
-        for link in soup.find_all(
-            "a",
-            {"class": "a-link-normal s-line-clamp-4 s-link-style a-text-normal"},
-            href=True,
-        )[:10]
-    ]
+    # Función que devuelve el json con los datos
+    async with AsyncWebCrawler(config=browser_config) as crawler:
+        # Extrae los datos
+        result = await crawler.arun(url=url, config=crawler_config)
 
-    lista_productos = []
-    for url_producto in lista_urls:
-        titulo, precio, imagen_url = get_producto_amazon(url_producto)
-        obj_producto = {
-            "titulo": titulo,
-            "precio": precio,
-            "imagen_url": imagen_url,
-            "url": url_producto
-        }
-        lista_productos.append(obj_producto)
+        # Formatear datos
+        if result and result.extracted_content:
+            
+            # Se convierte el JSON en un array de productos
+            products = json.loads(result.extracted_content)
 
-    return lista_productos
+            # Productos válidos
+            lista_productos = []
+
+            for product in products:
+                title = product.get('title', '')
+                # Truncar el título en el primer ":"
+                title = title.split(':')[0].strip()
+                product['title'] = title
+
+                if producto.lower() in product['title'].lower():
+                    # Formateo de url, se le añade https://amazon.es al inicio
+                    product_url = product.get('url', '')
+                    if not product_url.startswith('http'):
+                        product['url'] = urljoin('https://amazon.es', product_url) 
+                    
+                    # Eliminar el punto en el precio
+                    price = product.get('price', '').replace('.', '').strip()
+
+                    if not price:
+                        continue
+
+                    # Formatear el objeto final
+                    lista_productos.append({
+                        "titulo": product['title'],
+                        "precio": price,
+                        "tienda": "Amazon",
+                        "imagen_url": product.get('image'),
+                        "url": product.get('url')
+                    })
+
+                    if len(lista_productos) == 10:
+                        break
+
+            return lista_productos
+    
+    return []

@@ -58,7 +58,7 @@ def get_producto_pccomponentes(url):
 def get_lista_productos_pccomponentes(producto):
 
     url_producto = f"https://www.pccomponentes.com/search/?query={producto}"
-
+    
     options = uc.ChromeOptions()
     options.add_argument('--start-maximized')
 
@@ -66,13 +66,6 @@ def get_lista_productos_pccomponentes(producto):
     wait = WebDriverWait(driver, 20)
 
     lista_urls = []
-
-    # Palabras clave a excluir
-    no_product_keywords = [
-        "configurador", "servicios", "kit-digital", "novedades",
-        "reacondicionados", "empresas", "espacio-apple", "ofertas",
-        "regalos", "apple", "envio", "express", "pcdays"
-    ]
 
     try:
         driver.get(url_producto)
@@ -84,19 +77,23 @@ def get_lista_productos_pccomponentes(producto):
         except:
             pass
 
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'a[data-testid="normal-link"]')))
-        enlaces = driver.find_elements(By.CSS_SELECTOR, 'a[data-testid="normal-link"]')
+        enlaces = driver.find_elements(By.XPATH, '//a[contains(@class, "sc-jTrPJq")]')
 
         for enlace in enlaces:
             url = enlace.get_attribute("href")
-            if url and not any(bloqueo in url for bloqueo in no_product_keywords):
-                if url not in lista_urls:
-                    lista_urls.append(url)
+            if url and url not in lista_urls:
+                lista_urls.append(url)
             if len(lista_urls) >= 10:
                 break
 
+    except:
+        lista_urls = []
+        return  lista_urls
+              
     finally:
         driver.quit()
+
+    print(lista_urls)
 
     lista_productos = []
     for url_producto in lista_urls:
@@ -104,6 +101,7 @@ def get_lista_productos_pccomponentes(producto):
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
+            "tienda": "PcComponentes",
             "imagen_url": imagen_url,
             "url": url_producto,
         }
