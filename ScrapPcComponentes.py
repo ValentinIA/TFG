@@ -11,43 +11,50 @@ def get_producto_pccomponentes(url):
     # Configurar navegador
     options = Options()
     # options.add_argument('--headless')  # Para modo sin ventana
-    options.add_argument('--start-maximized')
+    options.add_argument("--start-maximized")
 
     driver = webdriver.Chrome(options=options)
-    wait = WebDriverWait(driver, 15)
+    wait = WebDriverWait(driver, 2)
 
-    title, precio, image_url = 'Título no encontrado', None, 'Imagen no encontrada'
 
     try:
         driver.get(url)
 
         # Obtener título
         try:
-            title_elem = wait.until(EC.presence_of_element_located((By.ID, "pdp-title")))
+            title_elem = wait.until(
+                EC.presence_of_element_located((By.ID, "pdp-title"))
+            )
             title = title_elem.text.strip()
         except Exception:
-            print("No se encontró el título.")
+            title = "Título no encontrado"
 
         # Obtener precio
         try:
             # Esperar a que esté el span con el precio completo
-            precio_entero_element = wait.until(EC.presence_of_element_located((By.ID, "pdp-price-current-integer")))
+            precio_entero_element = wait.until(
+                EC.presence_of_element_located((By.ID, "pdp-price-current-integer"))
+            )
 
             # Obtener el contenido como texto directo del DOM
             precio = precio_entero_element.get_attribute("textContent").strip()
-
+            precio = float(precio[:-1].replace(",", "."))
 
         except Exception as e:
-            print("Error obteniendo el precio:", e)
+            precio = -1
 
         # Obtener imagen
         try:
-            image_elem = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#pdp-section-images img')))
+            image_elem = wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "#pdp-section-images img")
+                )
+            )
             image_url = image_elem.get_attribute("src")
             if image_url.startswith("//"):
                 image_url = "https:" + image_url
         except Exception:
-            print("No se encontró la imagen.")
+            image_url =  None
 
     finally:
         driver.quit()
@@ -58,12 +65,12 @@ def get_producto_pccomponentes(url):
 def get_lista_productos_pccomponentes(producto):
 
     url_producto = f"https://www.pccomponentes.com/search/?query={producto}"
-    
+
     options = uc.ChromeOptions()
-    options.add_argument('--start-maximized')
+    options.add_argument("--start-maximized")
 
     driver = uc.Chrome(options=options)
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 4)
 
     lista_urls = []
 
@@ -71,7 +78,9 @@ def get_lista_productos_pccomponentes(producto):
         driver.get(url_producto)
 
         try:
-            boton_cookies = wait.until(EC.element_to_be_clickable((By.ID, "cookiesAcceptAll")))
+            boton_cookies = wait.until(
+                EC.element_to_be_clickable((By.ID, "cookiesAcceptAll"))
+            )
             boton_cookies.click()
             time.sleep(1)
         except:
@@ -83,13 +92,13 @@ def get_lista_productos_pccomponentes(producto):
             url = enlace.get_attribute("href")
             if url and url not in lista_urls:
                 lista_urls.append(url)
-            if len(lista_urls) >= 10:
+            if len(lista_urls) >= 1:
                 break
 
     except:
         lista_urls = []
-        return  lista_urls
-              
+        return lista_urls
+
     finally:
         driver.quit()
 

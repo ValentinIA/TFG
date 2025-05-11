@@ -29,8 +29,9 @@ def get_producto_mediamarkt(url):
         titulo = "Título no encontrado"
     try:
         precio = soup.find("span", {"class": "sc-e0c7d9f7-0 bPkjPs"}).get_text(strip=True)
+        precio = float(precio[:-1].replace(",", ".").strip())
     except AttributeError:
-        precio = "Precio no encontrado"
+        precio = -1
     try:
         imagen_url = soup.find("img", {"class": "sc-3c06cab3-1 iGTXmo pdp-gallery-image"})["src"]
     except (AttributeError, TypeError):

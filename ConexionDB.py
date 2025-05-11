@@ -1,7 +1,7 @@
 import mysql.connector
 
 config = {
-    'host': '54.89.241.127',
+    'host': '52.1.39.126',
     'port': 3307,
     'user': 'buypilot',
     'password': 'buypilot23',  

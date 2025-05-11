@@ -73,7 +73,7 @@ async def get_lista_productos_amazon(producto):
                         product['url'] = urljoin('https://amazon.es', product_url) 
                     
                     # Eliminar el punto en el precio
-                    price = product.get('price', '').replace('.', '').strip()
+                    price = float(product.get('price', '')[:-2].replace(',', '.').strip())
 
                     if not price:
                         continue
