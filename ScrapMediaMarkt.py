@@ -24,19 +24,26 @@ def get_producto_mediamarkt(url):
     soup = BeautifulSoup(respuesta.text, "lxml")
 
     try:
-        titulo = soup.find("div", attrs={"data-test": "mms-select-details-header"}).find("h1").get_text(strip=True)
+        titulo = (
+            soup.find("div", attrs={"data-test": "mms-select-details-header"})
+            .find("h1")
+            .get_text(strip=True)
+        )
     except AttributeError:
         titulo = "Título no encontrado"
     try:
-        precio = soup.find("span", {"class": "sc-e0c7d9f7-0 bPkjPs"}).get_text(strip=True)
+        precio = soup.find("span", {"class": "sc-e0c7d9f7-0 bPkjPs"}).get_text(
+            strip=True
+        )
         precio = float(precio[:-1].replace(",", ".").strip())
     except AttributeError:
         precio = -1
     try:
-        imagen_url = soup.find("img", {"class": "sc-3c06cab3-1 iGTXmo pdp-gallery-image"})["src"]
+        imagen_url = soup.find(
+            "img", {"class": "sc-3c06cab3-1 iGTXmo pdp-gallery-image"}
+        )["src"]
     except (AttributeError, TypeError):
         imagen_url = None
-
 
     return titulo, precio, imagen_url
 
@@ -64,8 +71,14 @@ def get_lista_productos_mediamarkt(producto):
     lista_urls = [
         "https://www.mediamarkt.es" + link["href"]
         for link in soup.find_all(
-            "a", 
-            attrs={"data-test": lambda x: x and ("mms-router-link-product-list-item-link" in x or "mms-router-link-product-list-item-link_mp" in x)},
+            "a",
+            attrs={
+                "data-test": lambda x: x
+                and (
+                    "mms-router-link-product-list-item-link" in x
+                    or "mms-router-link-product-list-item-link_mp" in x
+                )
+            },
             href=True,
         )[:10]
     ]
@@ -73,12 +86,14 @@ def get_lista_productos_mediamarkt(producto):
     lista_productos = []
     for url_producto in lista_urls:
         titulo, precio, imagen_url = get_producto_mediamarkt(url_producto)
+        if precio == -1:
+            continue
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
             "tienda": "MediaMarkt",
             "imagen_url": imagen_url,
-            "url": url_producto
+            "url": url_producto,
         }
         lista_productos.append(obj_producto)
 

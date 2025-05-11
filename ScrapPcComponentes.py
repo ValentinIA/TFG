@@ -16,7 +16,6 @@ def get_producto_pccomponentes(url):
     driver = webdriver.Chrome(options=options)
     wait = WebDriverWait(driver, 2)
 
-
     try:
         driver.get(url)
 
@@ -54,7 +53,7 @@ def get_producto_pccomponentes(url):
             if image_url.startswith("//"):
                 image_url = "https:" + image_url
         except Exception:
-            image_url =  None
+            image_url = None
 
     finally:
         driver.quit()
@@ -107,6 +106,8 @@ def get_lista_productos_pccomponentes(producto):
     lista_productos = []
     for url_producto in lista_urls:
         titulo, precio, imagen_url = get_producto_pccomponentes(url_producto)
+        if precio == -10:
+            continue
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
