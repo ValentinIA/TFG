@@ -6,3 +6,5 @@ uvicorn
 undetected-chromedriver
 selenium
 mysql-connector-python
+crawl4ai
+playwright

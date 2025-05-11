@@ -5,15 +5,7 @@ import json
 from urllib.parse import urljoin
 
 async def get_lista_productos_amazon(producto):
-    """
-    Función asíncrona para obtener productos de Amazon.
-    
-    Args:
-        producto (str): Término de búsqueda para productos en Amazon
-        
-    Returns:
-        list: Lista de diccionarios con información de productos
-    """
+
     # Configuración del browser que usará
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
 
