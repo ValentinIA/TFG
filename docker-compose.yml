@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: uvicorn Rutas:app --host 0.0.0.0 --port 8000 --reload

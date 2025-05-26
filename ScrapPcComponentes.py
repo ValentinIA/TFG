@@ -9,11 +9,13 @@ import undetected_chromedriver as uc
 
 def get_producto_pccomponentes(url):
     # Configurar navegador
-    options = Options()
-    # options.add_argument('--headless')  # Para modo sin ventana
-    options.add_argument("--start-maximized")
+    options = uc.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
 
-    driver = webdriver.Chrome(options=options)
+    driver = uc.Chrome(options=options)
     wait = WebDriverWait(driver, 2)
 
     try:
@@ -111,7 +113,7 @@ def get_lista_productos_pccomponentes(producto):
         obj_producto = {
             "titulo": titulo,
             "precio": precio,
-            "tienda": "PcComponentes",
+            "tienda": "PCComponentes",
             "imagen_url": imagen_url,
             "url": url_producto,
         }

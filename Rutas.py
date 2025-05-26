@@ -7,8 +7,12 @@ from ScrapPcComponentes import (
     get_producto_pccomponentes,
 )
 from crearusuario import usuario_nuevo
-from mostrarusuario import comprobar_pass
+from iniciosesion import comprobarpass
 from crearfavorito import favorito_nuevo
+from actualizarusuario import actualizarusuario
+from mostrarfavorito import mostrarfavoritos
+from mostrarportada import mostrarportada
+from mostrarusuario import mostrar_perfil
 
 app = FastAPI()
 
@@ -56,20 +60,52 @@ def crear_usuario(
     apellidos: str,
     email: str,
     password: str,
-    foto: str,
+    foto: str = None,
 ):
-    usuario = usuario_nuevo(nombre_usuario, nombre, apellidos, email, password, foto)
+    usuario = usuario_nuevo(
+        nombre_usuario, nombre, apellidos, email.lower(), password, foto
+    )
     return usuario
 
 
 @app.get("/loguear_ususario/")
 def loguear_ususario(email: str, password: str):
-    usuario = comprobar_pass(email, password)
+    usuario = comprobarpass(email, password)
     return usuario
 
 
-@app.post("/crearfavorito/")
-def crearfavorito(
+@app.post("/crear_favorito/")
+def crear_favorito(
     titulo: str, precio: str, imagen_url: str, url: str, id_usuario: str, tienda: str
 ):
     return favorito_nuevo(titulo, precio, imagen_url, url, id_usuario, tienda)
+
+
+@app.post("/actualizar_usuario/")
+def actualizar_usuario(
+    nombre_usuario: str,
+    nombre: str,
+    apellidos: str,
+    email: str,
+    password: str,
+    foto: str,
+    id: int,
+):
+    return actualizarusuario(
+        nombre_usuario, nombre, apellidos, email, password, foto, id
+    )
+
+
+@app.get("/mostrar_favorito/")
+def mostrar_favorito(id: int):
+    return mostrarfavoritos(id)
+
+
+@app.get("/mostrar_portada/")
+def mostrar_portada():
+    return mostrarportada()
+
+
+@app.get("/mostrar_usuario/")
+def mostrar_usuario(id: int):
+    return mostrar_perfil(id)
