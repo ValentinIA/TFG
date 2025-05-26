@@ -1,29 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from ScrapAmazone import get_lista_productos_amazon as obtener_productos_amazon
-from ScrapMediaMarkt import get_lista_productos_mediamarkt, get_producto_mediamarkt
-from ScrapPcComponentes import (
+from API.Scripts.ScrapAmazone import (
+    get_lista_productos_amazon as obtener_productos_amazon,
+)
+from API.Scripts.ScrapMediaMarkt import (
+    get_lista_productos_mediamarkt,
+    get_producto_mediamarkt,
+)
+from API.Scripts.ScrapPcComponentes import (
     get_lista_productos_pccomponentes,
     get_producto_pccomponentes,
 )
-from crearusuario import usuario_nuevo
-from iniciosesion import comprobarpass
-from crearfavorito import favorito_nuevo
-from actualizarusuario import actualizarusuario
-from mostrarfavorito import mostrarfavoritos
-from mostrarportada import mostrarportada
-from mostrarusuario import mostrar_perfil
+from API.Models.crearusuario import usuario_nuevo
+from API.Models.iniciosesion import comprobarpass
+from API.Models.crearfavorito import favorito_nuevo
+from API.Models.actualizarusuario import actualizarusuario
+from API.Models.mostrarfavorito import mostrarfavoritos
+from API.Models.mostrarportada import mostrarportada
+from API.Models.mostrarusuario import mostrar_perfil
+
 
 app = FastAPI()
-
-# Configuración de CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # o ["*"] si es desarrollo
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 @app.get("/get_productos_amazon/{producto}")

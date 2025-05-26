@@ -35,4 +35,3 @@ def favorito_nuevo(titulo, precio, imagen_url, url, id_usuario, tienda):
             conexion.close()
 
 
-# favorito_nuevo("Iphone 16", 650.40, "/home/imagen", "www.httpsdafdsf.com",18,"Amazon")

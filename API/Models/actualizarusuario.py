@@ -23,6 +23,8 @@ def actualizarusuario(nombre_usuario, nombre, apellidos, email, password, foto, 
                     sql, (nombre_usuario, nombre, apellidos, email, passwd, foto, id)
                 )
                 conexion.commit()
+
+                return {"exito": True}
             except IntegrityError as e:
                 return {"error": True, "msg": "El usuario no existe"}
 

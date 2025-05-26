@@ -35,7 +35,3 @@ def usuario_nuevo(nombre_usuario, nombre, apellidos, email, password, foto):
         if "conexion" in locals() and conexion.is_connected():
             cursor.close()
             conexion.close()
-
-
-# usuario_nuevo("admin","admin","admin uno","a@a","buypilotadmin123","admin","../foto")
-# usuario_nuevo("alex","Alex","Alonso Ocaña","alex@alex","buypilotadmin123","user","../foto")
