@@ -18,9 +18,19 @@ from API.Models.actualizarusuario import actualizarusuario
 from API.Models.mostrarfavorito import mostrarfavoritos
 from API.Models.mostrarportada import mostrarportada
 from API.Models.mostrarusuario import mostrar_perfil
+from API.Models.eliminarFavorito import eliminar_favorito
 
 
 app = FastAPI()
+
+# Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # o ["*"] si es desarrollo
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/get_productos_amazon/{producto}")
@@ -106,3 +116,7 @@ def mostrar_portada():
 @app.get("/mostrar_usuario/")
 def mostrar_usuario(id: int):
     return mostrar_perfil(id)
+
+@app.post("/eliminar_favorito/")
+def eliminarfavorito(ide: int, titulo: str):
+    return eliminar_favorito(ide, titulo)
