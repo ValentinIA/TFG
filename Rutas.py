@@ -1,16 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from API.Scripts.ScrapAmazone import (
-    get_lista_productos_amazon as obtener_productos_amazon,
-)
-from API.Scripts.ScrapMediaMarkt import (
-    get_lista_productos_mediamarkt,
-    get_producto_mediamarkt,
-)
-from API.Scripts.ScrapPcComponentes import (
-    get_lista_productos_pccomponentes,
-    get_producto_pccomponentes,
-)
+from API.Scripts.ScrapAmazone import get_productos_amazon
+from API.Scripts.ScrapFnac import get_productos_fnac
+from API.Scripts.ScrapMediaMarkt import get_productos_MediaMark
+
 from API.Models.crearusuario import usuario_nuevo
 from API.Models.iniciosesion import comprobarpass
 from API.Models.crearfavorito import favorito_nuevo
@@ -35,29 +28,16 @@ app.add_middleware(
 
 @app.get("/get_productos_amazon/{producto}")
 async def get_lista_productos_amazon(producto: str):
-    return await obtener_productos_amazon(producto)
+    return await get_productos_amazon(producto)
 
 
-@app.get("/get_productos_mediamarkt/{producto}")
-def get_productos_mediamarkt(producto: str):
-    return get_lista_productos_mediamarkt(producto)
+@app.get("/get_productos_fnac/{producto}")
+async def get_lista_productos_fnac(producto: str):
+    return await get_productos_fnac(producto)
 
-
-@app.get("/get_productos_pccomponentes/{prourlducto}")
-def get_productos_pccomponentes(producto: str):
-    return get_lista_productos_pccomponentes(producto)
-
-
-@app.get("/get_producto_mediamarkt/{url:path}")
-def get_productos_mediamarkt(url: str):
-    titulo, precio, imagen_url = get_producto_mediamarkt(url)
-    return {"titulo": titulo, "precio": precio, "imagen_url": imagen_url, "url": url}
-
-
-@app.get("/get_producto_pccomponente/{url:path}")
-def get_productos_pccomponentes(url: str):
-    titulo, precio, imagen_url = get_producto_pccomponentes(url)
-    return {"titulo": titulo, "precio": precio, "imagen_url": imagen_url, "url": url}
+@app.get("/get_productos_MediaMarkt/{producto}")
+async def get_lista_productos_MediaMarkt(producto: str):
+    return await get_productos_MediaMark(producto)
 
 
 @app.post("/crear_usuario/")
@@ -116,6 +96,7 @@ def mostrar_portada():
 @app.get("/mostrar_usuario/")
 def mostrar_usuario(id: int):
     return mostrar_perfil(id)
+
 
 @app.post("/eliminar_favorito/")
 def eliminarfavorito(ide: int, titulo: str):

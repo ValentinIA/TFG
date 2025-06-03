@@ -2,10 +2,9 @@ from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
-from urllib.parse import urljoin
 
 
-async def get_lista_productos_amazon(producto):
+async def get_productos_amazon(producto):
 
     # Configuración del browser que usará
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
@@ -48,52 +47,25 @@ async def get_lista_productos_amazon(producto):
         # Extrae los datos
         result = await crawler.arun(url=url, config=crawler_config)
 
-        # Formatear datos
-        if result and result.extracted_content:
+        products = json.loads(result.extracted_content)
 
-            # Se convierte el JSON en un array de productos
-            products = json.loads(result.extracted_content)
+        lista_productos = []
 
-            # Productos válidos
-            lista_productos = []
+        for product in products:
 
-            for product in products:
-                title = product.get("title", "")
-                # Truncar el título en el primer ":"
-                title = title.split(":")[0].strip()
-                product["title"] = title
+            price = float(product["price"].replace(".", "").replace(",", ".").replace("€", "").strip())
 
-                if producto.lower() in product["title"].lower():
-                    # Formateo de url, se le añade https://amazon.es al inicio
-                    product_url = product.get("url", "")
-                    if not product_url.startswith("http"):
-                        product["url"] = urljoin("https://amazon.es", product_url)
+            lista_productos.append(
+                {
+                    "titulo": product["title"],
+                    "precio": price,
+                    "tienda": "Amazon",
+                    "imagen_url": product.get("image"),
+                    "url": f"https://www.amazon.es{product.get('url')}",
+                }
+            )
 
-                    # Eliminar el punto en el precio
-                    try:
-                        price = float(
-                            product.get("price", "")[:-2].replace(",", ".").strip()
-                        )
-                    except ValueError:
-                        price = -1  #
+            if len(lista_productos) == 10:
+                break
 
-                    if not price:
-                        continue
-
-                    # Formatear el objeto final
-                    lista_productos.append(
-                        {
-                            "titulo": product["title"],
-                            "precio": price,
-                            "tienda": "Amazon",
-                            "imagen_url": product.get("image"),
-                            "url": product.get("url"),
-                        }
-                    )
-
-                    if len(lista_productos) == 10:
-                        break
-
-            return lista_productos
-
-    return []
+    return lista_productos

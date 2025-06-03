@@ -3,44 +3,39 @@ from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
+# from imagenfnac import getImage
 
-async def get_productos_MediaMark(producto):
+
+async def get_productos_fnac(producto):
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
 
     crawler_config = CrawlerRunConfig(
         extraction_strategy=JsonCssExtractionStrategy(
             schema={
-                "name": "Mediamarkt Product Search Results",
-                "baseSelector": ".sc-bd3ffc80-0.cZxRmA",
+                "name": "Fnac Product Search Results",
+                "baseSelector": "div.Article-item",
                 "fields": [
-                    {
-                        "name": "title",
-                        "selector": "[data-test='product-title']",
-                        "type": "text",
-                    },
+                    {"name": "title", "selector": "a.Article-title", "type": "text"},
                     {
                         "name": "url",
-                        "selector": "a[data-test='mms-router-link']",
+                        "selector": "a.Article-title",
                         "type": "attribute",
                         "attribute": "href",
                     },
                     {
                         "name": "image_url",
-                        "selector": "[data-test='product-image'] img",
-                        "type": "attribute",
-                        "attribute": "src",
+                        "selector": "div.zoomHover__zoomer",
+                        "type": "regex",
+                        "attribute": "style",
+                        "regex_pattern": r"url\('([^']+)'\)"
                     },
-                    {
-                        "name": "price",
-                        "selector": "span.sc-e0c7d9f7-0.bPkjPs",
-                        "type": "text",
-                    },
+                    {"name": "price", "selector": "strong.userPrice", "type": "text"},
                 ],
             }
         )
     )
 
-    url = f"https://www.mediamarkt.es/es/search.html?query={producto.replace(' ', '+')}"
+    url = f"https://www.fnac.es/SearchResult/ResultList.aspx?Search={producto}"
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
         result = await crawler.arun(url=url, config=crawler_config)
@@ -51,20 +46,19 @@ async def get_productos_MediaMark(producto):
             lista_productos = []
 
             for product in products:
-                
+
                 price = float(product["price"].replace(".", "").replace(",", ".").replace("€", "").strip())
 
                 lista_productos.append(
                     {
-                        "titulo": product.get("title"),
+                        "titulo": product["title"],
                         "precio": price,
-                        "tienda": "MediaMarkt",
+                        "tienda": "Fnac",
                         "imagen_url": product.get("image_url"),
-                        "url": f"https://www.mediamarkt.es{product.get('url')}",
+                        "url": product.get("url"),
                     }
                 )
 
                 if len(lista_productos) == 10:
                     break
-
     return lista_productos

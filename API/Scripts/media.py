@@ -4,7 +4,7 @@ from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
 
-async def get_productos_MediaMark(producto):
+async def extract_mediamarkt_products():
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
 
     crawler_config = CrawlerRunConfig(
@@ -16,7 +16,7 @@ async def get_productos_MediaMark(producto):
                     {
                         "name": "title",
                         "selector": "[data-test='product-title']",
-                        "type": "text",
+                        "type": "text"
                     },
                     {
                         "name": "url",
@@ -25,7 +25,7 @@ async def get_productos_MediaMark(producto):
                         "attribute": "href",
                     },
                     {
-                        "name": "image_url",
+                        "name": "image",
                         "selector": "[data-test='product-image'] img",
                         "type": "attribute",
                         "attribute": "src",
@@ -40,31 +40,22 @@ async def get_productos_MediaMark(producto):
         )
     )
 
-    url = f"https://www.mediamarkt.es/es/search.html?query={producto.replace(' ', '+')}"
+    url = "https://www.mediamarkt.es/es/search.html?query=Samsung+Galaxy+Tab"
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
         result = await crawler.arun(url=url, config=crawler_config)
 
         if result and result.extracted_content:
             products = json.loads(result.extracted_content)
-
-            lista_productos = []
-
+            
             for product in products:
-                
-                price = float(product["price"].replace(".", "").replace(",", ".").replace("€", "").strip())
+                print("\nProduct Details:")
+                print(f"Title: {product.get('title')}")
+                print(f"Price: {product.get('price')}")
+                print(f"Url: https://www.mediamarkt.es{product.get('url')}")
+                print(f"Image: {product.get('image')}")
 
-                lista_productos.append(
-                    {
-                        "titulo": product.get("title"),
-                        "precio": price,
-                        "tienda": "MediaMarkt",
-                        "imagen_url": product.get("image_url"),
-                        "url": f"https://www.mediamarkt.es{product.get('url')}",
-                    }
-                )
+if __name__ == "__main__":
+    import asyncio
 
-                if len(lista_productos) == 10:
-                    break
-
-    return lista_productos
+    asyncio.run(extract_mediamarkt_products())
