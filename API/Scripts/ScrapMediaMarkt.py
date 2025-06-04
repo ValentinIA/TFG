@@ -4,35 +4,34 @@ from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
 
-async def get_productos_MediaMark(producto):
+async def get_productos_amazon(producto):
+
+    # Configuración del browser que usará
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
 
+    # Reglas para localizar contenido
     crawler_config = CrawlerRunConfig(
         extraction_strategy=JsonCssExtractionStrategy(
             schema={
-                "name": "Mediamarkt Product Search Results",
-                "baseSelector": ".sc-bd3ffc80-0.cZxRmA",
+                "name": "Amazon Product Search Results",
+                "baseSelector": "[data-component-type='s-search-result']",
                 "fields": [
-                    {
-                        "name": "title",
-                        "selector": "[data-test='product-title']",
-                        "type": "text",
-                    },
+                    {"name": "title", "selector": "h2 span", "type": "text"},
                     {
                         "name": "url",
-                        "selector": "a[data-test='mms-router-link']",
+                        "selector": "a.a-link-normal.s-no-outline",
                         "type": "attribute",
                         "attribute": "href",
                     },
                     {
-                        "name": "image_url",
-                        "selector": "[data-test='product-image'] img",
+                        "name": "image",
+                        "selector": ".s-image",
                         "type": "attribute",
                         "attribute": "src",
                     },
-                    {
+                                        {
                         "name": "price",
-                        "selector": "span.sc-e0c7d9f7-0.bPkjPs",
+                        "selector": ".a-price .a-offscreen",
                         "type": "text",
                     },
                 ],
@@ -40,31 +39,43 @@ async def get_productos_MediaMark(producto):
         )
     )
 
-    url = f"https://www.mediamarkt.es/es/search.html?query={producto.replace(' ', '+')}"
+    # Url que scrappeará
+    url = f"https://www.amazon.es/s?k={producto}"
 
+    # Función que devuelve el json con los datos
     async with AsyncWebCrawler(config=browser_config) as crawler:
+        # Extrae los datos
         result = await crawler.arun(url=url, config=crawler_config)
 
-        if result and result.extracted_content:
-            products = json.loads(result.extracted_content)
+        products = json.loads(result.extracted_content)
 
-            lista_productos = []
+        lista_productos = []
 
-            for product in products:
-                
-                price = float(product["price"].replace(".", "").replace(",", ".").replace("€", "").strip())
+        for product in products:
+            
+            price = product.get("price", "").strip()
 
-                lista_productos.append(
-                    {
-                        "titulo": product.get("title"),
-                        "precio": price,
-                        "tienda": "MediaMarkt",
-                        "imagen_url": product.get("image_url"),
-                        "url": f"https://www.mediamarkt.es{product.get('url')}",
-                    }
-                )
+            if price.startswith("€"):
+                price = price.replace("€", "").strip()
+            else:
+                price = price.replace(".", "").replace(",", ".").replace("€", "").strip()
 
-                if len(lista_productos) == 10:
-                    break
+            try:
+                price = float(price)
+            except ValueError:
+                price = -1
+        
+            lista_productos.append(
+                {
+                    "titulo": product["title"],
+                    "precio": price,
+                    "tienda": "Amazon",
+                    "imagen_url": product.get("image"),
+                    "url": f"https://www.amazon.es{product.get('url')}",
+                }
+            )
+
+            if len(lista_productos) == 10:
+                break
 
     return lista_productos
