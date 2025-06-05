@@ -3,7 +3,7 @@ from mysql.connector import Error
 from mysql.connector import ProgrammingError
 
 
-def mostrarfavoritos(id_usuario):
+def mostrar_favoritos(id_usuario):
     try:
         # Realizamos la conexiÃ³n a la base de datos
         conexion = mysql.connector.connect(

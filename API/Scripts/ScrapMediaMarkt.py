@@ -4,7 +4,7 @@ from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
 
-async def get_productos_amazon(producto):
+async def get_productos_MediaMark(producto):
 
     # Configuración del browser que usará
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
@@ -13,25 +13,29 @@ async def get_productos_amazon(producto):
     crawler_config = CrawlerRunConfig(
         extraction_strategy=JsonCssExtractionStrategy(
             schema={
-                "name": "Amazon Product Search Results",
-                "baseSelector": "[data-component-type='s-search-result']",
+                "name": "Mediamarkt Product Search Results",
+                "baseSelector": ".sc-bd3ffc80-0",
                 "fields": [
-                    {"name": "title", "selector": "h2 span", "type": "text"},
+                    {
+                        "name": "title",
+                        "selector": "[data-test='product-title']",
+                        "type": "text"
+                    },
                     {
                         "name": "url",
-                        "selector": "a.a-link-normal.s-no-outline",
+                        "selector": "a[data-test='mms-router-link']",
                         "type": "attribute",
                         "attribute": "href",
                     },
                     {
                         "name": "image",
-                        "selector": ".s-image",
+                        "selector": "[data-test='product-image'] img",
                         "type": "attribute",
                         "attribute": "src",
                     },
-                                        {
+                    {
                         "name": "price",
-                        "selector": ".a-price .a-offscreen",
+                        "selector": "span.sc-e0c7d9f7-0.bPkjPs",
                         "type": "text",
                     },
                 ],
@@ -40,7 +44,7 @@ async def get_productos_amazon(producto):
     )
 
     # Url que scrappeará
-    url = f"https://www.amazon.es/s?k={producto}"
+    url = f"https://www.mediamarkt.es/es/search.html?query={producto}"
 
     # Función que devuelve el json con los datos
     async with AsyncWebCrawler(config=browser_config) as crawler:
@@ -52,26 +56,21 @@ async def get_productos_amazon(producto):
         lista_productos = []
 
         for product in products:
+
+            price = product.get("price").replace(".", "").replace(",", ".").replace("€", "").strip()
             
-            price = product.get("price", "").strip()
-
-            if price.startswith("€"):
-                price = price.replace("€", "").strip()
-            else:
-                price = price.replace(".", "").replace(",", ".").replace("€", "").strip()
-
             try:
                 price = float(price)
             except ValueError:
-                price = -1
-        
+                continue
+
             lista_productos.append(
                 {
-                    "titulo": product["title"],
+                    "titulo": product.get("title"),
                     "precio": price,
-                    "tienda": "Amazon",
+                    "tienda": "MediaMarkt",
                     "imagen_url": product.get("image"),
-                    "url": f"https://www.amazon.es{product.get('url')}",
+                    "url": f"https://www.mediamarkt.es{product.get('url')}",
                 }
             )
 

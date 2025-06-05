@@ -4,7 +4,7 @@ from mysql.connector import Error
 from mysql.connector import ProgrammingError
 
 
-def mostrarportada():
+def mostrar_portada():
     try:
         # Realizamos la conexión a la base de datos
         conexion = mysql.connector.connect(

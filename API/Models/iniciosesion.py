@@ -3,7 +3,7 @@ import bcrypt
 from mysql.connector import Error
 
 
-def comprobarpass(email, password):
+def comprobar_pass(email, password):
     try:
         config = {
             "host": "52.1.39.126",

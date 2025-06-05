@@ -6,7 +6,7 @@ import json
 # from imagenfnac import getImage
 
 
-async def get_productos_fnac(producto):
+async def get_productos_Fnac(producto):
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
 
     crawler_config = CrawlerRunConfig(
@@ -47,7 +47,12 @@ async def get_productos_fnac(producto):
 
             for product in products:
 
-                price = float(product["price"].replace(".", "").replace(",", ".").replace("€", "").strip())
+                price = product.get("price").replace(".", "").replace(",", ".").replace("€", "").strip()
+            
+                try:
+                    price = float(price)
+                except ValueError:
+                    continue
 
                 lista_productos.append(
                     {

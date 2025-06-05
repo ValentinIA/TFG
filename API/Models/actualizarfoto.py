@@ -3,7 +3,7 @@ from mysql.connector import Error
 from mysql.connector import IntegrityError
 
 
-def actualizar_usuario(nombre_usuario, nombre, apellidos, email, id):
+def actualizar_foto(foto, id):
     try:
         # Realizamos la conexión a la base de datos
         conexion = mysql.connector.connect(
@@ -16,9 +16,9 @@ def actualizar_usuario(nombre_usuario, nombre, apellidos, email, id):
         if conexion.is_connected():
             cursor = conexion.cursor()
             try:
-                sql = "update usuarios set nombre_usuario= %s, nombre = %s, apellidos = %s, email = %s where id=%s "
+                sql = "update usuarios set foto = %s where id=%s "
                 cursor.execute(
-                    sql, (nombre_usuario, nombre, apellidos, email, id)
+                    sql, (foto, id)
                 )
                 conexion.commit()
 

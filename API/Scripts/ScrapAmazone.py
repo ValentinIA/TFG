@@ -4,7 +4,7 @@ from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
 
-async def get_productos_amazon(producto):
+async def get_productos_Amazon(producto):
 
     # Configuración del browser que usará
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
@@ -29,7 +29,7 @@ async def get_productos_amazon(producto):
                         "type": "attribute",
                         "attribute": "src",
                     },
-                    {
+                                        {
                         "name": "price",
                         "selector": ".a-price .a-offscreen",
                         "type": "text",
@@ -52,9 +52,19 @@ async def get_productos_amazon(producto):
         lista_productos = []
 
         for product in products:
+            
+            price = product.get("price", "").strip()
 
-            price = float(product["price"].replace(".", "").replace(",", ".").replace("€", "").strip())
+            if price.startswith("€"):
+                price = price.replace("€", "").strip()
+            else:
+                price = price.replace(".", "").replace(",", ".").replace("€", "").strip()
 
+            try:
+                price = float(price)
+            except ValueError:
+                continue
+        
             lista_productos.append(
                 {
                     "titulo": product["title"],
