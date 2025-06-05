@@ -1,18 +1,20 @@
 import mysql.connector
 from mysql.connector import Error
-
+from dotenv import load_dotenv
+import os
 
 def mostrar_perfil(ide):
     try:
-        config = {
-            "host": "52.1.39.126",
-            "port": 3307,
-            "user": "buypilot",
-            "password": "buypilot23",
-            "database": "BuyPilot",
-        }
-        # Realizamos la conexiÃ³n a la base de datos
-        conexion = mysql.connector.connect(**config)
+        # Realizamos la conexión a la base de datos
+        load_dotenv()
+
+        conexion = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            port=int(os.getenv("DB_PORT")),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
+        )
         if conexion.is_connected():
             cursor = conexion.cursor()
             sql = "select nombre_usuario, nombre, apellidos, email, password, foto from usuarios where id = %s"

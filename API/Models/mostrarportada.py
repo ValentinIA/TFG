@@ -2,17 +2,20 @@ import mysql.connector
 import random
 from mysql.connector import Error
 from mysql.connector import ProgrammingError
-
+from dotenv import load_dotenv
+import os
 
 def mostrar_portada():
     try:
         # Realizamos la conexión a la base de datos
+        load_dotenv()
+
         conexion = mysql.connector.connect(
-            host="52.1.39.126",
-            port=3307,
-            user="buypilot",
-            password="buypilot23",
-            database="BuyPilot",
+            host=os.getenv("DB_HOST"),
+            port=int(os.getenv("DB_PORT")),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
         )
         if conexion.is_connected():
             cursor = conexion.cursor()
