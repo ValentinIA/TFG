@@ -1,4 +1,4 @@
-FROM python:3.10docker
+FROM python:3.10
 
 WORKDIR /app
 
