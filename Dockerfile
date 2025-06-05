@@ -1,13 +1,9 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Copiar y instalar dependencias de Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Instala las dependencias necesarias para Chromium
-RUN apt-get update && apt-get install -y \
+# Instala las dependencias necesarias del sistema para Chromium y pip
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     libnspr4 \
     libdbus-1-3 \
@@ -25,15 +21,16 @@ RUN apt-get update && apt-get install -y \
     wget \
     curl \
     ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalar playwright (si no está en requirements.txt)
-RUN pip install playwright
+# Copiar e instalar dependencias de Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Instala navegador Chromium
-RUN playwright install chromium
+# Instalar navegador Chromium con playwright
+RUN playwright install --with-deps chromium
 
-# Copiar el código de la app
+# Copiar el resto del código
 COPY . .
 
 EXPOSE 8000
