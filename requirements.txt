@@ -1,11 +1,8 @@
 fastapi[all]
 playwright
 requests
-beautifulsoup4
-lxml
 uvicorn
 undetected-chromedriver
-selenium
 mysql-connector-python
 crawl4ai
 bcrypt
