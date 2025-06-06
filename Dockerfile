@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copiar e instalar dependencias de Python
-COPY requirements.txt .
+COPY ../requirements.txt /app/requirements.txt
 
 # Copiar e instalar dependencias de Python
 COPY requirements.txt .
