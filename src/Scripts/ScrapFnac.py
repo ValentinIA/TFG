@@ -3,9 +3,6 @@ from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
-# from imagenfnac import getImage
-
-
 async def get_productos_Fnac(producto):
     browser_config = BrowserConfig(browser_type="chromium", headless=True)
 

@@ -16,12 +16,17 @@ def comprobar_pass(email, password):
                 return {"error": True, "msg": "El usuario no existe"}
             else:
                 if bcrypt.checkpw(password.encode(), passwd[0].encode()):
-                    sql = "select id from usuarios where email = %s"
+                    sql = "select id, nombre_usuario, nombre, apellidos, email, foto from usuarios where email = %s"
                     cursor.execute(sql, (email,))
-                    ide = cursor.fetchone()
+                    datos = cursor.fetchone()
 
                     usuario = {
-                        "ide": ide[0],
+                        "id": datos[0],
+                        "nombre_usuario": datos[1],
+                        "nombre": datos[2],
+                        "apellidos": datos[3],
+                        "email": datos[4],
+                        "foto": datos[5]
                     }
 
                     return {"exito": True, "data": usuario}
