@@ -1,20 +1,10 @@
-import mysql.connector
 from mysql.connector import Error
-from dotenv import load_dotenv
-import os
-
+from Models.Conexion_db import get_conexion
 def eliminar_favorito(ide, titulo):
     try:
         # Realizamos la conexión a la base de datos
-        load_dotenv()
-
-        conexion = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            port=int(os.getenv("DB_PORT")),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-        )
+        conexion = get_conexion()
+        
         if conexion.is_connected():
             cursor = conexion.cursor()
             sql = "DELETE FROM productos_favoritos WHERE id_usuario = %s AND titulo = %s"

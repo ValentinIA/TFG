@@ -1,21 +1,11 @@
-import mysql.connector
 from mysql.connector import Error
 from mysql.connector import ProgrammingError
-from dotenv import load_dotenv
-import os
+from Models.Conexion_db import get_conexion
 
 def favorito_nuevo(titulo, precio, imagen_url, url, id_usuario, tienda):
     try:
         # Realizamos la conexión a la base de datos
-        load_dotenv()
-
-        conexion = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            port=int(os.getenv("DB_PORT")),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-        )
+        conexion = get_conexion()
         
         if conexion.is_connected():
             cursor = conexion.cursor()

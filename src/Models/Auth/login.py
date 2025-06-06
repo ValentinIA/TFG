@@ -1,21 +1,12 @@
-import mysql.connector
 import bcrypt
 from mysql.connector import Error
-from dotenv import load_dotenv
-import os
+from Models.Conexion_db import get_conexion
 
 def comprobar_pass(email, password):
     try:
         # Realizamos la conexión a la base de datos
-        load_dotenv()
+        conexion = get_conexion()
 
-        conexion = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            port=int(os.getenv("DB_PORT")),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-        )
         if conexion.is_connected():
             cursor = conexion.cursor()
             sql = "select password from usuarios where email = %s"

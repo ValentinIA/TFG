@@ -1,28 +1,20 @@
-import mysql.connector
+import bcrypt
 from mysql.connector import Error
 from mysql.connector import IntegrityError
-from dotenv import load_dotenv
-import os
+from Models.Conexion_db import get_conexion
 
-def actualizar_usuario(nombre_usuario, nombre, apellidos, email, id):
+def actualizar_pass_usuario(password, id):
     try:
         # Realizamos la conexión a la base de datos
-        load_dotenv()
-
-        conexion = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            port=int(os.getenv("DB_PORT")),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-        )
-
+        conexion = get_conexion()
+             
         if conexion.is_connected():
             cursor = conexion.cursor()
             try:
-                sql = "update usuarios set nombre_usuario= %s, nombre = %s, apellidos = %s, email = %s where id=%s "
+                passwd = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+                sql = "update usuarios set password = %s where id=%s "
                 cursor.execute(
-                    sql, (nombre_usuario, nombre, apellidos, email, id)
+                    sql, ( passwd, id)
                 )
                 conexion.commit()
 
