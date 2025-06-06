@@ -1,3 +1,3 @@
 # TFG Comparador de precios
 
-Arrancar con uvicorn Rutas:app
+Arrancar desde src con uvicorn app:app
