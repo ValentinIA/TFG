@@ -1,10 +1,7 @@
-# Rutas.py (tu archivo principal actualizado)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Importar los nuevos routers
-
-
+# Importar los routers
 from Routers.router_auth import router as router_auth
 from Routers.router_index import router as router_index
 from Routers.router_usuarios import router as router_usuarios
@@ -12,7 +9,7 @@ from Routers.router_productos import router as router_productos
 from Routers.router_favoritos import router as router_favoritos 
 
 app = FastAPI(
-    title="API de Productos y Usuarios",
+    title="API de BuyPilot",
     description="API para scraping de productos y gestión de usuarios",
 )
 
