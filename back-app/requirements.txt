@@ -1,0 +1,9 @@
+fastapi[all]
+python-dotenv
+playwright
+requests
+uvicorn
+undetected-chromedriver
+mysql-connector-python
+crawl4ai
+bcrypt
