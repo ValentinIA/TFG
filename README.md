@@ -1,1 +1,1 @@
-Bakend de la aplicacion de TFG BuyPilot.
+Bakend de la aplicacion de TFG BuyPilot el desarollo se encuentra en back-app.
